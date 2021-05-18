@@ -16,11 +16,6 @@
     <body></body>
     <script>        
 
-        window.addEventListener('keydown', function(e) {
-            if(e.keyCode == 32 && e.target == document.body) {
-                e.preventDefault();
-            }
-        })
         
         var scaleCanvasToRetina = function(c){
             var canvasWidth = window.innerWidth;
@@ -46,7 +41,7 @@
                  Press <strong>J</strong> when the small box appears on the <strong>right</strong>. <br>
                  Press the <strong>Spacebar</strong> if the small box appears in the <strong>middle</strong>.<br>
                  Remember to always focus on the middle box! Press spacebar to continue.<br>
-                 Good luck!</p>,
+                 Good luck!</p>
             `
             };
 

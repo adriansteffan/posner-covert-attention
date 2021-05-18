@@ -1,3 +1,7 @@
 .jspsych-content {
     max-width: unset;
 }
+
+.jspsych-display-element{
+    overflow-y: hidden;
+}

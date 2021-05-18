@@ -9,6 +9,7 @@
 
 /* Container holding jsPsych content */
 
+
  .jspsych-display-element {
    display: flex;
    flex-direction: column;
@@ -24,6 +25,7 @@
    margin: auto;
    flex: 1 1 100%;
    width: 100%;
+   max-height: 100%;
  }
 
  .jspsych-content {
