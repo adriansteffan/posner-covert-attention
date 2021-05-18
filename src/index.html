@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Posner Covert Attention</title>
+
+        <script src="jspsych-6.3.1/jspsych.js"></script>
+        <script src="jspsych-6.3.1/plugins/jspsych-preload.js"></script>
+
+        <script src="jspsych-6.3.1/plugins/jspsych-html-keyboard-response.js"></script>
+        <script src="jspsych-6.3.1/plugins/jspsych-canvas-keyboard-response.js"></script>
+        <script src="jspsych-6.3.1/plugins/jspsych-fullscreen.js"></script>
+
+        <link href="jspsych-6.3.1/css/jspsych.css" rel="stylesheet" type="text/css">
+        <link href="patch.css" rel="stylesheet" type="text/css">
+    </head>
+    <body></body>
+    <script>        
+
+        window.addEventListener('keydown', function(e) {
+            if(e.keyCode == 32 && e.target == document.body) {
+                e.preventDefault();
+            }
+        })
+        
+        var scaleCanvasToRetina = function(c){
+            var canvasWidth = window.innerWidth;
+            var canvasHeight = window.innerHeight;
+
+            c.width = canvasWidth * window.devicePixelRatio;
+            c.height = canvasHeight * window.devicePixelRatio;
+            c.style.width = canvasWidth + "px";
+            c.style.height = canvasHeight + "px";
+
+            c.getContext('2d').scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            c.getContext('2d').lineWidth = 4;
+        }
+
+        
+
+        var welcome = {
+            type: "html-keyboard-response",
+            stimulus: `<p>Welcome to this mid seminar experiment! Please focus on the middle box
+                 at all times. <br>
+                 Press <strong>F</strong> when the small box appears on the <strong>left</strong>.<br>
+                 Press <strong>J</strong> when the small box appears on the <strong>right</strong>. <br>
+                 Press the <strong>Spacebar</strong> if the small box appears in the <strong>middle</strong>.<br>
+                 Remember to always focus on the middle box! Press spacebar to continue.<br>
+                 Good luck!</p>,
+            `
+            };
+
+        var squareSizeBig = 75 * window.devicePixelRatio;
+        var squareSizeSmall = 20 * window.devicePixelRatio;
+ 
+        var posyBig = window.innerHeight*0.5-0.5*squareSizeBig;
+        var posx1Big = window.innerWidth*0.25-0.5*squareSizeBig;
+        var posx2Big = window.innerWidth*0.5-0.5*squareSizeBig;
+        var posx3Big = window.innerWidth*0.75-0.5*squareSizeBig;
+
+        var posySmall = window.innerHeight*0.5-0.5*squareSizeSmall;
+        var posx1Small = window.innerWidth*0.25-0.5*squareSizeSmall;
+        var posx2Small = window.innerWidth*0.5-0.5*squareSizeSmall;
+        var posx3Small = window.innerWidth*0.75-0.5*squareSizeSmall;
+        
+        
+        var state = {
+            highlightFun: null,
+            targetFun: null,
+            pause: null,
+            skipped: null,
+        };
+
+        function drawPosnerBase(ctx){
+            ctx.beginPath();
+            ctx.rect(posx1Big, posyBig, squareSizeBig, squareSizeBig);
+            ctx.rect(posx2Big, posyBig, squareSizeBig, squareSizeBig);
+            ctx.rect(posx3Big, posyBig, squareSizeBig, squareSizeBig);
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function posnerBase(c){
+            scaleCanvasToRetina(c);
+            var ctx = c.getContext('2d');
+            drawPosnerBase(ctx);
+        }
+        
+
+        function posnerRightHighlight(c){
+            scaleCanvasToRetina(c);
+            var ctx = c.getContext('2d');
+            drawPosnerBase(ctx);
+            ctx.beginPath();
+            ctx.strokeStyle = "red";
+            ctx.rect(posx3Big, posyBig, squareSizeBig, squareSizeBig);
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function posnerLeftHighlight(c){
+            scaleCanvasToRetina(c);
+            var ctx = c.getContext('2d');
+            drawPosnerBase(ctx);
+            ctx.beginPath();
+            ctx.strokeStyle = "red";
+            ctx.rect(posx1Big, posyBig, squareSizeBig, squareSizeBig);
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function posnerSetRandomHighlight(){
+            state.highlightFun = [posnerRightHighlight, posnerLeftHighlight][Math.floor(Math.random() * 2)];
+            return state.highlightFun.name;
+        }
+
+        function posnerRightTarget(c){
+            scaleCanvasToRetina(c);
+            var ctx = c.getContext('2d');
+            drawPosnerBase(ctx);
+            ctx.beginPath();
+            ctx.rect(posx3Small, posySmall, squareSizeSmall, squareSizeSmall);
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function posnerLeftTarget(c){
+            scaleCanvasToRetina(c);
+            var ctx = c.getContext('2d');
+            drawPosnerBase(ctx);
+            ctx.beginPath();
+            ctx.rect(posx1Small, posySmall, squareSizeSmall, squareSizeSmall);
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function posnerMiddleTarget(c){
+            scaleCanvasToRetina(c);
+            var ctx = c.getContext('2d');
+            drawPosnerBase(ctx);
+            ctx.beginPath();
+            ctx.rect(posx2Small, posySmall, squareSizeSmall, squareSizeSmall);
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function posnerSetRandomTarget(){
+            state.targetFun = Array(6).fill(posnerMiddleTarget).concat([posnerRightTarget, posnerLeftTarget, posnerBase, posnerBase])[Math.floor(Math.random() * 10)];
+            return state.targetFun.name;
+        }
+
+        var trialPosnerBasic1 = {
+            type: 'canvas-keyboard-response',
+            stimulus: posnerBase,
+            choices: jsPsych.NO_KEYS,
+            trial_duration: 1000,
+            data: {id: 'posnerBase'}
+        }
+
+        var trialPosnerHighlight = {
+            type: 'canvas-keyboard-response',
+            stimulus: (c) => {state.highlightFun(c)},
+            choices: jsPsych.NO_KEYS,
+            trial_duration: 150,
+            data: {id: () => posnerSetRandomHighlight()}
+        }
+
+        var trialPosnerBasic2 = {
+            type: 'canvas-keyboard-response',
+            stimulus: posnerBase,
+            choices: jsPsych.NO_KEYS,
+            trial_duration: () => {
+                state.pause = jsPsych.randomization.sampleWithoutReplacement([0, 50, 100, 200, 300, 500], 1)[0];
+                return state.pause;
+            },
+            data: {id: 'posnerBasePause'}
+        }
+
+        var correctKeypresses = {
+            "posnerBase": null,
+            "posnerRightTarget": 'j',
+            "posnerMiddleTarget": ' ',
+            "posnerLeftTarget": 'f',
+
+        }
+
+        var trialPosnerTarget = {
+            type: 'canvas-keyboard-response',
+            stimulus: (c) => {state.targetFun(c)},
+            choices: ['f', 'j', ' '],
+            trial_duration: () => {
+                posnerSetRandomTarget();
+                state.skipped = state.targetFun.name == "posnerBase";
+                return state.skipped ? 0 : null;
+            },
+            data: {
+                id: () => state.targetFun.name,
+                cue: () => state.highlightFun.name,
+                pause: () => state.pause,
+                correct_response: () => correctKeypresses[state.targetFun.name],
+                relevant: () => !state.skipped,
+
+            },
+            on_finish: function(data){
+                data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+            }
+        }
+
+        var testProcedure = {
+            timeline: [trialPosnerBasic1, trialPosnerHighlight, trialPosnerBasic2, trialPosnerTarget],
+            repetitions: 130,
+        }
+
+        var debriefBlock = {
+            type: "html-keyboard-response",
+            stimulus: function() {
+
+                var trials = jsPsych.data.get().filter({relevant: true})//.filter({trial_duration: null});
+                console.log(trials.count());
+                var correct_trials = trials.filter({correct: true});
+                var accuracy = Math.round(correct_trials.count() / trials.count() * 100);
+                var rt = Math.round(correct_trials.select('rt').mean());
+
+                return `<p>You responded correctly on ${accuracy}% of the trials.</p>
+                <p>Your average response time was ${rt}ms.</p>
+                <p>Press any key to complete the experiment. Thank you!</p>`;
+
+            }
+        };
+
+
+        var timeline = [
+            welcome,
+            testProcedure,
+            debriefBlock
+        ];
+
+
+        jsPsych.init({
+        timeline: timeline,
+        use_webaudio: false,
+        on_finish: function() {
+            //jsPsych.data.displayData();
+        }
+        
+        })
+
+    
+    </script>
+</html>
