@@ -2,7 +2,7 @@
 set -e
 
 cd ..
-cp src prod/webroot
+cp -r src prod/webroot
 cp -r jspsych-6.3.1 prod/webroot
 
 cd prod
