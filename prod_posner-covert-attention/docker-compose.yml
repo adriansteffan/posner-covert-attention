@@ -1,6 +1,6 @@
 version: "3"
 services:
-    webserver:
+    posner-covert-attention:
         build: .
         ports: 
             - "127.0.0.1:10650:80"
