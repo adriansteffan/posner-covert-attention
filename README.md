@@ -1,6 +1,6 @@
 # Components of Visual Attention (Posner & Cohen, 1984)
 A browser based implementation of posners basic paradigm as presented in [Components of Visual Attention](https://www.researchgate.net/publication/203918232_Components_of_visual_orienting) using jsPsych.
-It it meant to be used as a demonstration when discussing the paper in a lecture. You can try out a hosted version at [posner.psych.study](https://posner.psych.study)
+It it meant to be used as a demonstration when discussing the paper in a lecture.
 
 This implementation deviates slightly from the original paradigm, as the black square cannot appear while the cue is still active. Also, the cue was replaced with a red flashing of the corresponding box. As this implementation is built for demonstration purposes, these minor were found to be unproblematic.
 
